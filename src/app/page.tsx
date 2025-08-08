@@ -32,6 +32,7 @@ export default function Home() {
   const [iosConfig, setIosConfig] = useState<AppleAppSiteAssociation | null>(null)
   const [androidConfig, setAndroidConfig] = useState<AssetLink[] | null>(null)
   const [baseUrl, setBaseUrl] = useState<string>('')
+  const [customPath, setCustomPath] = useState<string>('')
   const [showQR, setShowQR] = useState<string | null>(null)
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
 
@@ -80,43 +81,80 @@ export default function Home() {
 
         {/* App Transition Test URLs */}
         <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">🚀 App Transition Test</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">🚀 App Transition Test (From Config)</h2>
           {iosConfig && (
             <div className="mb-6">
-              <h3 className="font-medium text-gray-700 mb-3">iOS Universal Links</h3>
-              <div className="space-y-2">
-                {iosConfig.applinks.details.map((detail, index) => 
-                  detail.paths?.map((path, pathIndex) => {
-                    const testUrl = `${baseUrl}${path === '*' ? '/test' : path}`
-                    return (
-                      <div key={`${index}-${pathIndex}`} className="flex items-center gap-2">
-                        <a
-                          href={testUrl}
-                          className="text-xs sm:text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 p-2 sm:p-3 rounded break-all text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-between flex-1"
-                        >
-                          <span>{testUrl}</span>
-                          <div className="flex items-center ml-2">
-                            <span className="hidden sm:inline text-xs bg-blue-200 px-2 py-1 rounded mr-2">
-                              {detail.appID.split('.').pop()}
-                            </span>
-                            <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 12l-4-4h8l-4 4z"/>
-                            </svg>
+              <div className="space-y-4">
+                {iosConfig.applinks.details.map((detail, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2">
+                      App ID: {detail.appID}
+                    </div>
+                    <div className="space-y-2">
+                      {detail.paths?.map((path, pathIndex) => {
+                        const configUrl = `${baseUrl}${path === '*' ? '/test' : path}`
+                        const customUrl = customPath ? `${baseUrl}${customPath}` : configUrl
+                        
+                        return (
+                          <div key={pathIndex} className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <div className="text-xs text-gray-500 w-16 flex-shrink-0">Config:</div>
+                              <a
+                                href={configUrl}
+                                className="text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2 rounded break-all text-gray-600 hover:text-gray-800 transition-colors flex-1"
+                              >
+                                {configUrl}
+                              </a>
+                              <button
+                                onClick={() => generateQR(configUrl)}
+                                className="bg-gray-100 hover:bg-gray-200 p-2 rounded transition-colors flex-shrink-0"
+                                title="Generate QR Code for Config Path"
+                              >
+                                <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
+                                </svg>
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-0">
+                              <div className="text-xs text-blue-600 w-16 flex-shrink-0">Custom:</div>
+                              <div className="flex items-center flex-1 border border-blue-200 rounded overflow-hidden focus-within:ring-1 focus-within:ring-blue-400">
+                                <div className="px-2 py-1 bg-blue-50 text-xs text-blue-700 border-r border-blue-200 whitespace-nowrap">
+                                  {baseUrl}
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="/custom/path"
+                                  value={customPath}
+                                  onChange={(e) => setCustomPath(e.target.value)}
+                                  className="flex-1 px-2 py-1 text-xs border-0 focus:outline-none focus:ring-0"
+                                />
+                              </div>
+                              {customPath && (
+                                <>
+                                  <a
+                                    href={customUrl}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors whitespace-nowrap ml-2"
+                                  >
+                                    Test
+                                  </a>
+                                  <button
+                                    onClick={() => generateQR(customUrl)}
+                                    className="bg-blue-100 hover:bg-blue-200 p-2 rounded transition-colors flex-shrink-0 ml-1"
+                                    title="Generate QR Code for Custom Path"
+                                  >
+                                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
+                                    </svg>
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                        </a>
-                        <button
-                          onClick={() => generateQR(testUrl)}
-                          className="bg-blue-100 hover:bg-blue-200 p-2 rounded transition-colors flex-shrink-0"
-                          title="Generate QR Code for App Test"
-                        >
-                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
-                          </svg>
-                        </button>
-                      </div>
-                    )
-                  })
-                )}
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
