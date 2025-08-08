@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import QRCode from 'qrcode'
 
 interface AppleAppSiteAssociation {
   applinks: {
@@ -31,6 +32,30 @@ export default function Home() {
   const [iosConfig, setIosConfig] = useState<AppleAppSiteAssociation | null>(null)
   const [androidConfig, setAndroidConfig] = useState<AssetLink[] | null>(null)
   const [baseUrl, setBaseUrl] = useState<string>('')
+  const [showQR, setShowQR] = useState<string | null>(null)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
+
+  const generateQR = async (url: string) => {
+    try {
+      const qrDataUrl = await QRCode.toDataURL(url, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      })
+      setQrCodeUrl(qrDataUrl)
+      setShowQR(url)
+    } catch (error) {
+      console.error('QR Code generation failed:', error)
+    }
+  }
+
+  const closeQR = () => {
+    setShowQR(null)
+    setQrCodeUrl('')
+  }
 
   useEffect(() => {
     setBaseUrl(window.location.origin)
@@ -61,23 +86,36 @@ export default function Home() {
               <h3 className="font-medium text-gray-700 mb-3">iOS Universal Links</h3>
               <div className="space-y-2">
                 {iosConfig.applinks.details.map((detail, index) => 
-                  detail.paths.map((path, pathIndex) => (
-                    <a
-                      key={`${index}-${pathIndex}`}
-                      href={`${baseUrl}${path === '*' ? '/test' : path}`}
-                      className="text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 p-3 rounded break-all text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-between"
-                    >
-                      <span>{baseUrl}{path === '*' ? '/test' : path}</span>
-                      <div className="flex items-center ml-2">
-                        <span className="text-xs bg-blue-200 px-2 py-1 rounded mr-2">
-                          {detail.appID.split('.').pop()}
-                        </span>
-                        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 12l-4-4h8l-4 4z"/>
-                        </svg>
+                  detail.paths?.map((path, pathIndex) => {
+                    const testUrl = `${baseUrl}${path === '*' ? '/test' : path}`
+                    return (
+                      <div key={`${index}-${pathIndex}`} className="flex items-center gap-2">
+                        <a
+                          href={testUrl}
+                          className="text-xs sm:text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 p-2 sm:p-3 rounded break-all text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-between flex-1"
+                        >
+                          <span>{testUrl}</span>
+                          <div className="flex items-center ml-2">
+                            <span className="hidden sm:inline text-xs bg-blue-200 px-2 py-1 rounded mr-2">
+                              {detail.appID.split('.').pop()}
+                            </span>
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 12l-4-4h8l-4 4z"/>
+                            </svg>
+                          </div>
+                        </a>
+                        <button
+                          onClick={() => generateQR(testUrl)}
+                          className="bg-blue-100 hover:bg-blue-200 p-2 rounded transition-colors flex-shrink-0"
+                          title="Generate QR Code for App Test"
+                        >
+                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
+                          </svg>
+                        </button>
                       </div>
-                    </a>
-                  ))
+                    )
+                  })
                 )}
               </div>
             </div>
@@ -174,6 +212,47 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* QR Code Modal */}
+        {showQR && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={closeQR}
+          >
+            <div 
+              className="bg-white rounded-lg p-6 max-w-sm w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">QR Code</h3>
+                <button
+                  onClick={closeQR}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="text-center">
+                {qrCodeUrl && (
+                  <img 
+                    src={qrCodeUrl} 
+                    alt="QR Code" 
+                    className="mx-auto mb-4"
+                  />
+                )}
+                <p className="text-sm text-gray-600 break-all">
+                  {showQR}
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Scan with your mobile device
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
