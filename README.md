@@ -1,26 +1,29 @@
 # Universal Link Inspector
 
-Universal Link と App Link の検証用 Web フロントエンド
+Web frontend for validating Universal Links and App Links
 
-## 使用方法
+## Usage
 
-1. 開発サーバーを起動（Cloudflared でHTTPS URL生成）:
+1. Start the development server (generates HTTPS URL with Cloudflared):
+
 ```bash
 yarn dev:tunnel
 ```
 
-2. 生成された HTTPS URL で設定ファイルを確認:
+2. Verify configuration files with the generated HTTPS URL:
+
 - `https://your-url.trycloudflare.com/.well-known/apple-app-site-association`
 - `https://your-url.trycloudflare.com/.well-known/assetlinks.json`
 
-## 設定変更
+## Configuration Changes
 
-`public/.well-known/` 内のファイルを編集:
-- `apple-app-site-association`: iOS Universal Links設定
-- `assetlinks.json`: Android App Links設定
+Edit files in `public/.well-known/`:
 
-## 機能
+- `apple-app-site-association`: iOS Universal Links configuration
+- `assetlinks.json`: Android App Links configuration
 
-- iOS/Android 設定内容のリアルタイム表示
-- Cloudflared による HTTPS URL 自動生成
-- 設定ファイルの直接編集とプレビュー
+## Features
+
+- Real-time display of iOS/Android configuration content
+- Automatic HTTPS URL generation with Cloudflared
+- Direct editing and preview of configuration files
