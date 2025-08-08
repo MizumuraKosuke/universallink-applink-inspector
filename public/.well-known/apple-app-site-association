@@ -7,5 +7,11 @@
         "paths": ["*"]
       }
     ]
+  },
+  "activitycontinuation": {
+    "apps": ["TEAM_ID.BUNDLE_ID"]
+  },
+  "webcredentials": {
+    "apps": ["TEAM_ID.BUNDLE_ID"]
   }
 }
