@@ -1,62 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import QRCode from 'qrcode'
-
-interface AppleAppSiteAssociation {
-  applinks: {
-    apps: string[]
-    details: Array<{
-      appID: string
-      paths: string[]
-    }>
-  }
-  activitycontinuation?: {
-    apps: string[]
-  }
-  webcredentials?: {
-    apps: string[]
-  }
-}
-
-interface AssetLink {
-  relation: string[]
-  target: {
-    namespace: string
-    package_name: string
-    sha256_cert_fingerprints: string[]
-  }
-}
+import TestUrlButton from '../components/test-url-button'
+import QRCodeButton from '../components/qr-code-button'
+import CustomPathForm from '../components/custom-path-form'
+import ConfigSection from '../components/config-section'
 
 export default function Home() {
   const [iosConfig, setIosConfig] = useState<AppleAppSiteAssociation | null>(null)
   const [androidConfig, setAndroidConfig] = useState<AssetLink[] | null>(null)
   const [baseUrl, setBaseUrl] = useState<string>('')
   const [customPath, setCustomPath] = useState<string>('')
-  const [showQR, setShowQR] = useState<string | null>(null)
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
-
-  const generateQR = async (url: string) => {
-    try {
-      const qrDataUrl = await QRCode.toDataURL(url, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      })
-      setQrCodeUrl(qrDataUrl)
-      setShowQR(url)
-    } catch (error) {
-      console.error('QR Code generation failed:', error)
-    }
-  }
-
-  const closeQR = () => {
-    setShowQR(null)
-    setQrCodeUrl('')
-  }
 
   useEffect(() => {
     setBaseUrl(window.location.origin)
@@ -98,67 +52,22 @@ export default function Home() {
                     <div className="space-y-2">
                       {detail.paths?.map((path, pathIndex) => {
                         const configUrl = `${baseUrl}${path === '*' ? '/test' : path}`
-                        const customUrl = customPath ? `${baseUrl}${customPath}` : configUrl
                         
                         return (
                           <div key={pathIndex} className="space-y-2">
                             <div className="flex items-center gap-2">
                               <div className="text-xs text-gray-500 w-16 flex-shrink-0">Config:</div>
-                              <a
-                                href={`https://httpbin.org/redirect-to?url=${encodeURIComponent(configUrl)}`}
-                                target="_blank"
-                                className="text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2 rounded break-all text-gray-600 hover:text-gray-800 transition-colors flex-1"
-                              >
-                                {configUrl}
-                              </a>
-                              <button
-                                onClick={() => generateQR(configUrl)}
-                                className="bg-gray-100 hover:bg-gray-200 p-2 rounded transition-colors flex-shrink-0"
+                              <TestUrlButton url={configUrl} className="flex-1" />
+                              <QRCodeButton 
+                                url={configUrl} 
                                 title="Generate QR Code for Config Path"
-                              >
-                                <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
-                                </svg>
-                              </button>
+                              />
                             </div>
-                            <div className="w-full">
-                              <div className="text-xs text-blue-600 mb-2">Custom Path:</div>
-                              <div className="mb-2">
-                                <div className="w-full border border-blue-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-400">
-                                  <div className="bg-blue-50 px-3 py-2 text-xs text-blue-700 border-b border-blue-200">
-                                    {baseUrl}
-                                  </div>
-                                  <input
-                                    type="text"
-                                    placeholder="/custom/path"
-                                    value={customPath}
-                                    onChange={(e) => setCustomPath(e.target.value)}
-                                    className="w-full px-3 py-3 text-sm border-0 focus:outline-none focus:ring-0"
-                                  />
-                                </div>
-                              </div>
-                              {customPath && (
-                                <div className="flex flex-col sm:flex-row gap-2">
-                                  <a
-                                    href={`https://httpbin.org/redirect-to?url=${encodeURIComponent(customUrl)}`}
-                                    target="_blank"
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors text-center flex-1"
-                                  >
-                                    Test Custom Path
-                                  </a>
-                                  <button
-                                    onClick={() => generateQR(customUrl)}
-                                    className="bg-blue-100 hover:bg-blue-200 px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-                                    title="Generate QR Code for Custom Path"
-                                  >
-                                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                      <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
-                                    </svg>
-                                    <span className="text-sm sm:hidden">QR</span>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+                            <CustomPathForm 
+                              baseUrl={baseUrl}
+                              customPath={customPath}
+                              onPathChange={setCustomPath}
+                            />
                           </div>
                         )
                       })}
@@ -171,49 +80,21 @@ export default function Home() {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {/* iOS Configuration */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center">
-              <span className="mr-2">🍎</span>
-              iOS Universal Links
-            </h2>
-            
-            <div className="mb-4">
-              <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">Configuration URL:</h3>
-              <code className="text-xs sm:text-sm bg-gray-100 p-2 rounded block break-all text-blue-600">
-                {baseUrl}/.well-known/apple-app-site-association
-              </code>
-            </div>
+          <ConfigSection 
+            title="iOS Universal Links"
+            icon="🍎"
+            configUrl={`${baseUrl}/.well-known/apple-app-site-association`}
+            config={iosConfig}
+            loading={!iosConfig}
+          />
 
-            <div className="mb-4">
-              <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">Configuration:</h3>
-              <pre className="text-gray-700 text-xs sm:text-sm bg-gray-100 p-2 sm:p-4 rounded overflow-auto max-h-48 sm:max-h-64">
-                {iosConfig ? JSON.stringify(iosConfig, null, 2) : 'Loading...'}
-              </pre>
-            </div>
-          </div>
-
-          {/* Android Configuration */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center">
-              <span className="mr-2">🤖</span>
-              Android App Links
-            </h2>
-            
-            <div className="mb-4">
-              <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">Configuration URL:</h3>
-              <code className="text-sm bg-gray-100 p-2 rounded block break-all text-green-600">
-                {baseUrl}/.well-known/assetlinks.json
-              </code>
-            </div>
-
-            <div className="mb-4">
-              <h3 className="font-medium text-gray-700 mb-2 text-sm sm:text-base">Configuration:</h3>
-              <pre className="text-gray-700 text-xs sm:text-sm bg-gray-100 p-2 sm:p-4 rounded overflow-auto max-h-48 sm:max-h-64">
-                {androidConfig ? JSON.stringify(androidConfig, null, 2) : 'Loading...'}
-              </pre>
-            </div>
-          </div>
+          <ConfigSection 
+            title="Android App Links"
+            icon="🤖"
+            configUrl={`${baseUrl}/.well-known/assetlinks.json`}
+            config={androidConfig}
+            loading={!androidConfig}
+          />
         </div>
 
         {/* Instructions */}
@@ -260,47 +141,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* QR Code Modal */}
-        {showQR && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-            onClick={closeQR}
-          >
-            <div 
-              className="bg-white rounded-lg p-6 max-w-sm w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">QR Code</h3>
-                <button
-                  onClick={closeQR}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="text-center">
-                {qrCodeUrl && (
-                  <img 
-                    src={qrCodeUrl} 
-                    alt="QR Code" 
-                    className="mx-auto mb-4"
-                  />
-                )}
-                <p className="text-sm text-gray-600 break-all">
-                  {showQR}
-                </p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Scan with your mobile device
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
