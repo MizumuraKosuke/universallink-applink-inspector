@@ -1,3 +1,4 @@
+import { REDIRECT_TEST_URL } from '@/constants'
 import QRCodeButton from './qr-code-button'
 
 interface CustomPathFormProps {
@@ -33,7 +34,7 @@ export default function CustomPathForm({
       {customPath && (
         <div className="flex flex-col sm:flex-row gap-2">
           <a
-            href={`https://httpbin.org/redirect-to?url=${encodeURIComponent(customUrl)}`}
+            href={`${REDIRECT_TEST_URL}?url=${encodeURIComponent(customUrl)}`}
             target="_blank"
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors text-center flex-1"
           >

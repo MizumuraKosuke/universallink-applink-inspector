@@ -5,6 +5,8 @@ import TestUrlButton from '../components/test-url-button'
 import QRCodeButton from '../components/qr-code-button'
 import CustomPathForm from '../components/custom-path-form'
 import ConfigSection from '../components/config-section'
+import { APPLE_APP_SITE_ASSOCIATION_URL } from '@/constants'
+import type { AppleAppSiteAssociation, AssetLink } from '@/types'
 
 export default function Home() {
   const [iosConfig, setIosConfig] = useState<AppleAppSiteAssociation | null>(null)
@@ -127,7 +129,7 @@ export default function Home() {
             </div>
             <div className="mt-3 pt-3 border-t border-green-200">
               <a 
-                href="https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.associated-domains"
+                href={APPLE_APP_SITE_ASSOCIATION_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs sm:text-sm text-green-700 hover:text-green-900 underline flex items-center flex-wrap"
@@ -143,5 +145,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-type AppleAppSiteAssociation = {
+export type AppleAppSiteAssociation = {
   applinks: {
     apps: string[]
     details: Array<{
@@ -14,7 +14,7 @@ type AppleAppSiteAssociation = {
   }
 }
 
-type AssetLink = {
+export type AssetLink = {
   relation: string[]
   target: {
     namespace: string

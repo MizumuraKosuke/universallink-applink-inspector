@@ -1,5 +1,6 @@
+import { QRCODE_API_URL } from '@/constants'
 import { useState } from 'react'
-import QRCode from 'qrcode'
+import Image from 'next/image'
 
 interface QRCodeButtonProps {
   url: string
@@ -12,35 +13,14 @@ export default function QRCodeButton({
   title = "Generate QR Code",
   className = "" 
 }: QRCodeButtonProps) {
-  const [showQR, setShowQR] = useState<string | null>(null)
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
+  const [showQR, setShowQR] = useState(false)
 
-  const generateQR = async (url: string) => {
-    try {
-      const qrDataUrl = await QRCode.toDataURL(url, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      })
-      setQrCodeUrl(qrDataUrl)
-      setShowQR(url)
-    } catch (error) {
-      console.error('QR Code generation failed:', error)
-    }
-  }
-
-  const closeQR = () => {
-    setShowQR(null)
-    setQrCodeUrl('')
-  }
+  const qrCodeUrl = `${QRCODE_API_URL}?url=${encodeURIComponent(url)}`
 
   return (
     <>
       <button
-        onClick={() => generateQR(url)}
+        onClick={() => setShowQR(true)}
         className={`bg-gray-100 hover:bg-gray-200 p-2 rounded transition-colors flex-shrink-0 ${className}`}
         title={title}
       >
@@ -53,7 +33,7 @@ export default function QRCodeButton({
       {showQR && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={closeQR}
+          onClick={() => setShowQR(false)}
         >
           <div 
             className="bg-white rounded-lg p-6 max-w-sm w-full"
@@ -62,7 +42,7 @@ export default function QRCodeButton({
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">QR Code</h3>
               <button
-                onClick={closeQR}
+                onClick={() => setShowQR(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -73,9 +53,11 @@ export default function QRCodeButton({
             
             <div className="text-center">
               {qrCodeUrl && (
-                <img 
+                <Image 
                   src={qrCodeUrl} 
                   alt="QR Code" 
+                  width={200}
+                  height={200}
                   className="mx-auto mb-4"
                 />
               )}

@@ -2,7 +2,7 @@ interface ConfigSectionProps {
   title: string
   icon: string
   configUrl: string
-  config: any
+  config: unknown
   loading?: boolean
 }
 
