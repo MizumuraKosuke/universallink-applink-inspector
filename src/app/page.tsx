@@ -82,6 +82,11 @@ export default function Home() {
         {/* App Transition Test URLs */}
         <div className="mb-8 bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">🚀 App Transition Test (From Config)</h2>
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              🌐 <strong>External Redirect Test:</strong> Uses httpbin.org to redirect from external domain and trigger Universal Links
+            </p>
+          </div>
           {iosConfig && (
             <div className="mb-6">
               <div className="space-y-4">
@@ -100,7 +105,8 @@ export default function Home() {
                             <div className="flex items-center gap-2">
                               <div className="text-xs text-gray-500 w-16 flex-shrink-0">Config:</div>
                               <a
-                                href={configUrl}
+                                href={`https://httpbin.org/redirect-to?url=${encodeURIComponent(configUrl)}`}
+                                target="_blank"
                                 className="text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 p-2 rounded break-all text-gray-600 hover:text-gray-800 transition-colors flex-1"
                               >
                                 {configUrl}
@@ -115,38 +121,42 @@ export default function Home() {
                                 </svg>
                               </button>
                             </div>
-                            <div className="flex items-center gap-0">
-                              <div className="text-xs text-blue-600 w-16 flex-shrink-0">Custom:</div>
-                              <div className="flex items-center flex-1 border border-blue-200 rounded overflow-hidden focus-within:ring-1 focus-within:ring-blue-400">
-                                <div className="px-2 py-1 bg-blue-50 text-xs text-blue-700 border-r border-blue-200 whitespace-nowrap">
-                                  {baseUrl}
+                            <div className="w-full">
+                              <div className="text-xs text-blue-600 mb-2">Custom Path:</div>
+                              <div className="mb-2">
+                                <div className="w-full border border-blue-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-400">
+                                  <div className="bg-blue-50 px-3 py-2 text-xs text-blue-700 border-b border-blue-200">
+                                    {baseUrl}
+                                  </div>
+                                  <input
+                                    type="text"
+                                    placeholder="/custom/path"
+                                    value={customPath}
+                                    onChange={(e) => setCustomPath(e.target.value)}
+                                    className="w-full px-3 py-3 text-sm border-0 focus:outline-none focus:ring-0"
+                                  />
                                 </div>
-                                <input
-                                  type="text"
-                                  placeholder="/custom/path"
-                                  value={customPath}
-                                  onChange={(e) => setCustomPath(e.target.value)}
-                                  className="flex-1 px-2 py-1 text-xs border-0 focus:outline-none focus:ring-0"
-                                />
                               </div>
                               {customPath && (
-                                <>
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <a
-                                    href={customUrl}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors whitespace-nowrap ml-2"
+                                    href={`https://httpbin.org/redirect-to?url=${encodeURIComponent(customUrl)}`}
+                                    target="_blank"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors text-center flex-1"
                                   >
-                                    Test
+                                    Test Custom Path
                                   </a>
                                   <button
                                     onClick={() => generateQR(customUrl)}
-                                    className="bg-blue-100 hover:bg-blue-200 p-2 rounded transition-colors flex-shrink-0 ml-1"
+                                    className="bg-blue-100 hover:bg-blue-200 px-4 py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
                                     title="Generate QR Code for Custom Path"
                                   >
                                     <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM19 13h-2v2h2v-2zM19 17h-2v2h2v-2zM17 15h-2v2h2v-2zM13 13h2v2h-2v-2zM15 15h2v2h-2v-2zM13 17h2v2h-2v-2z"/>
                                     </svg>
+                                    <span className="text-sm sm:hidden">QR</span>
                                   </button>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>
